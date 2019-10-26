@@ -1,5 +1,6 @@
 package mairo;
 
+import mairo.dto.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
@@ -10,20 +11,22 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.stream.IntStream;
 
-public class UberWriter {
-  public static final String SHEET_NAME = "CACM_2.2&2.3 flow-based";
+import static mairo.CacmXlsxConstants.*;
+
+public class CacmXlsxWriter {
+
 
   public void generateTemplate(NtcBasedAllocationXlsxTemplate data, FileOutputStream fos) throws IOException {
     XSSFWorkbook workbook = new XSSFWorkbook();
     Sheet sheet = workbook.createSheet(SHEET_NAME);
     // row #1
-    prepareVioletRow(workbook, sheet, "NTC-based capacity allocation and network utilisation", 0, true);
+    prepareVioletRow(workbook, sheet, GENERAL_INFO, 0, true);
     //row #2
-    prepareVioletRow(workbook, sheet, "NTC-based capacity allocation and network utilisation [CACM 2.2&2.3]", 1, false);
+    prepareVioletRow(workbook, sheet, NTC_BASED_CAPACITY_ALLOCATION_AND_NETWORK_UTILISATION, 1, false);
     // row #3
-    prepareVioletRow(workbook, sheet, "NTC-based capacity allocation and network utilisation - Result [CACM 2.2&2.3]", 2, false);
+    prepareVioletRow(workbook, sheet, NTC_BASED_CAPACITY_ALLOCATION_AND_NETWORK_UTILISATION_RESULT, 2, false);
     // violet interval row
-    String intervalWithTimeZone = data.getTimeInterval() + " (" + data.getTimezone() + ")";
+    String intervalWithTimeZone = data.getTimeInterval() + LB_SPACED + data.getTimezone() + RB;
     prepareVioletRow(workbook, sheet, intervalWithTimeZone, 3, false);
     // grey time interval with region
     prepareTimeIntervalWithRegionHeaders(workbook, sheet);
@@ -40,7 +43,7 @@ public class UberWriter {
       row++;
       prepareConstraintsTableHeaders(workbook, sheet, row, mtu.getConstraintContainer());
       row++;
-      for (XlsxConstraintRow constraintRow : mtu.getConstraintContainer().getConstraintRows()) {
+      for (ConstraintXlsxTemplate constraintRow : mtu.getConstraintContainer().getConstraintRows()) {
         prepareConstraintsTable(workbook, sheet, row, constraintRow);
         row++;
       }
@@ -73,26 +76,26 @@ public class UberWriter {
 
   private void prepareResultTableHeaders(XSSFWorkbook wb, Sheet sheet, int rowLine) {
     Row row = sheet.createRow(rowLine);
-    tripleLineHeaderCell(row, 0, "Out Area \n > \n In Area", wb, sheet);
-    headerCell(row, 1, "Name", wb);
-    headerCell(row, 2, "EIC", wb);
-    headerCell(row, 3, "Type", wb);
-    headerCell(row, 4, "Location", wb);
-    headerCell(row, 5, "Max flow [MW]", wb);
-    headerCell(row, 6, "Max Exchange [MW]", wb);
-    tripleLineHeaderCell(row, 7, "Max Exchange \n After Remedy [MW]", wb, sheet);
-    headerCell(row, 8, "AAC", wb);
-    headerCell(row, 9, "TRM", wb);
-    headerCell(row, 10, "TTC", wb);
+    tripleLineHeaderCell(row, 0, RESULT_DIRECTION_HEADER, wb, sheet);
+    headerCell(row, 1, RESULT_NAME_HEADER, wb);
+    headerCell(row, 2, RESULT_EIC_HEADER, wb);
+    headerCell(row, 3, RESULT_TYPE_HEADER, wb);
+    headerCell(row, 4, RESULT_LOCATION_HEADER, wb);
+    headerCell(row, 5, RESULT_MAX_FLOW_HEADER, wb);
+    headerCell(row, 6, RESULT_MAX_EXCHANGE_HEADER, wb);
+    tripleLineHeaderCell(row, 7, RESULT_MAX_EXCHANGE_AFTER_REMEDY_HEADER, wb, sheet);
+    headerCell(row, 8, RESULT_AAC_HEADER, wb);
+    headerCell(row, 9, RESULT_TRM_HEADER, wb);
+    headerCell(row, 10, RESULT_TTC_HEADER, wb);
   }
 
   private void prepareResultsHeader(XSSFWorkbook wb, Sheet sheet, int rowLine) {
     Row row = sheet.createRow(rowLine);
     IntStream.rangeClosed(0, 10).forEach(i -> {
       if (i == 0) {
-        headerCell(row, i, "Result", wb);
+        headerCell(row, i, RESULT_HEADER, wb);
       } else {
-        headerCell(row, i, "", wb);
+        headerCell(row, i, EMPTY_STRING, wb);
       }
     });
 
@@ -100,7 +103,7 @@ public class UberWriter {
     sheet.addMergedRegion(mergedCell1);
   }
 
-  private void prepareConstraintsTable(XSSFWorkbook workbook, Sheet sheet, int rowLine, XlsxConstraintRow constraintRow) {
+  private void prepareConstraintsTable(XSSFWorkbook workbook, Sheet sheet, int rowLine, ConstraintXlsxTemplate constraintRow) {
     Row row = sheet.createRow(rowLine);
     Cell c0 = row.createCell(0);
     c0.setCellValue(constraintRow.getConstraintId());
@@ -164,23 +167,23 @@ public class UberWriter {
   }
 
 
-  private void prepareConstraintsTableHeaders(XSSFWorkbook wb, Sheet sheet, int rowLine, ConstraintsContainer constraintsContainer) {
-    Row row = sheet.createRow(rowLine);
-    headerCell(row, 0, "Constraint ID", wb);
-    headerCell(row, 1, "cb/co name", wb);
-    headerCell(row, 2, "cb/co eic", wb);
-    headerCell(row, 3, "cb/co type", wb);
-    headerCell(row, 4, "cb/co location", wb);
-    headerCell(row, 5, "cb/co In Area", wb);
-    headerCell(row, 6, "cb/co Out Area", wb);
-    headerCell(row, 7, constraintsContainer.getArea1Name(), wb);
-    headerCell(row, 8, constraintsContainer.getArea2Name(), wb);
-    headerCell(row, 9, constraintsContainer.getArea3Name(), wb);
-    headerCell(row, 10, constraintsContainer.getArea4Name(), wb);
-    headerCell(row, 11, constraintsContainer.getArea5Name(), wb);
-    headerCell(row, 12, "Fref [MW]", wb);
-    headerCell(row, 13, "Fmax [MW]", wb);
-    headerCell(row, 14, "Actual flow [MW]", wb);
+  private void prepareConstraintsTableHeaders(XSSFWorkbook wb, Sheet sheet, int rowLine, ConstraintsContainerXlsxTemplate constraintsContainer) {
+    Row headersRow = sheet.createRow(rowLine);
+    headerCell(headersRow, 0, CONSTRAINT_ID_HEADER, wb);
+    headerCell(headersRow, 1, CONSTRAINT_NAME_HEADER, wb);
+    headerCell(headersRow, 2, CONSTRAINT_EIC_HEADER, wb);
+    headerCell(headersRow, 3, CONSTRAINT_TYPE_HEADER, wb);
+    headerCell(headersRow, 4, CONSTRAINT_LOCATION_HEADER, wb);
+    headerCell(headersRow, 5, CONSTRAINT_IN_AREA_HEADER, wb);
+    headerCell(headersRow, 6, CONSTRAINT_OUT_AREA_HEADER, wb);
+    headerCell(headersRow, 7, constraintsContainer.getArea1Name(), wb);
+    headerCell(headersRow, 8, constraintsContainer.getArea2Name(), wb);
+    headerCell(headersRow, 9, constraintsContainer.getArea3Name(), wb);
+    headerCell(headersRow, 10, constraintsContainer.getArea4Name(), wb);
+    headerCell(headersRow, 11, constraintsContainer.getArea5Name(), wb);
+    headerCell(headersRow, 12, CONSTRAINT_FREF_HEADER, wb);
+    headerCell(headersRow, 13, CONSTRAINT_FMAX_HEADER, wb);
+    headerCell(headersRow, 14, CONSTRAINT_ACTUAL_FLOW_HEADER, wb);
     IntStream.rangeClosed(0, 14).forEach(sheet::autoSizeColumn);
   }
 
@@ -188,11 +191,11 @@ public class UberWriter {
     Row row = sheet.createRow(rowLine);
     IntStream.rangeClosed(0, 14).forEach(i -> {
       if (i == 0) {
-        headerCell(row, i, "Constraint", wb);
+        headerCell(row, i, CONSTRAINT_HEADER, wb);
       } else if (i == 7) {
-        headerCell(row, i, "PTDF", wb);
+        headerCell(row, i, PTDF_HEADER, wb);
       } else {
-        headerCell(row, i, "", wb);
+        headerCell(row, i, EMPTY_STRING, wb);
       }
     });
     CellRangeAddress mergedCell1 = new CellRangeAddress(rowLine, rowLine, 0, 6);
@@ -209,9 +212,9 @@ public class UberWriter {
       if (i == 0) {
         yellowCell(row, i, mtu.getInterval(), wb);
       } else if (i == 9) {
-        yellowCell(row, i, mtu.getSummary(), wb);
+        yellowCell(row, i, mtuSummary(mtu.getConstraintsNum(), mtu.getResultsNum()), wb);
       } else {
-        yellowCell(row, i, "", wb);
+        yellowCell(row, i, EMPTY_STRING, wb);
       }
     });
     CellRangeAddress mergedCell1 = new CellRangeAddress(rowLine, rowLine, 0, 8);
@@ -221,21 +224,7 @@ public class UberWriter {
   }
 
   private void prepareMtuHeader(XSSFWorkbook wb, Sheet sheet) {
-    int rowNum = 7;
-    Row row = sheet.createRow(rowNum);
-    IntStream.rangeClosed(0, 19).forEach(i -> {
-      if (i == 0) {
-        headerCell(row, i, "MTU", wb);
-      } else if (i == 9) {
-        headerCell(row, i, "MTU Summary", wb);
-      } else {
-        headerCell(row, i, "", wb);
-      }
-    });
-    CellRangeAddress tiRange = new CellRangeAddress(rowNum, rowNum, 0, 8);
-    CellRangeAddress regionRange = new CellRangeAddress(rowNum, rowNum, 9, 19);
-    sheet.addMergedRegion(tiRange);
-    sheet.addMergedRegion(regionRange);
+    prepareGreyHeadersBlock(wb, sheet, 7, MTU_HEADER, MTU_SUMMARY_HEADER);
   }
 
   private void prepareTimeIntervalWithRegionValues(XSSFWorkbook wb, Sheet sheet, NtcBasedAllocationXlsxTemplate data) {
@@ -243,11 +232,11 @@ public class UberWriter {
     Row row = sheet.createRow(rowNum);
     IntStream.rangeClosed(0, 19).forEach(i -> {
       if (i == 0) {
-        yellowCell(row, i, data.getTimeInterval() + " (" + data.getTimezone() + ")", wb);
+        yellowCell(row, i, data.getTimeInterval() + LB_SPACED + data.getTimezone() + RB, wb);
       } else if (i == 19) {
         yellowCell(row, i, data.getRegion(), wb);
       } else {
-        yellowCell(row, i, "", wb);
+        yellowCell(row, i, EMPTY_STRING, wb);
       }
     });
     CellRangeAddress tiRange = new CellRangeAddress(rowNum, rowNum, 0, 8);
@@ -258,22 +247,7 @@ public class UberWriter {
 
 
   private void prepareTimeIntervalWithRegionHeaders(XSSFWorkbook wb, Sheet sheet) {
-    int rowNum = 5;
-    Row row = sheet.createRow(rowNum);
-    IntStream.rangeClosed(0, 19).forEach(i -> {
-      if (i == 0) {
-        headerCell(row, i, "Time Interval", wb);
-      } else if (i == 9) {
-        headerCell(row, i, "Region", wb);
-
-      } else {
-        headerCell(row, i, "", wb);
-      }
-    });
-    CellRangeAddress tiRange = new CellRangeAddress(rowNum, rowNum, 0, 8);
-    CellRangeAddress regionRange = new CellRangeAddress(rowNum, rowNum, 9, 19);
-    sheet.addMergedRegion(tiRange);
-    sheet.addMergedRegion(regionRange);
+    prepareGreyHeadersBlock(wb, sheet, 5, TIME_INTERVAL_HEADER, REGION_HEADER);
   }
 
   private void prepareVioletRow(XSSFWorkbook wb, Sheet sheet, String text, int rowLine, boolean boldFont) {
@@ -341,7 +315,7 @@ public class UberWriter {
 
   private Font defaultFont(XSSFWorkbook workbook, boolean isBold) {
     Font font = workbook.createFont();
-    font.setFontName("Arial");
+    font.setFontName(DEFAULT_FONT);
     font.setBold(isBold);
     font.setFontHeightInPoints((short) 10);
     font.setColor(IndexedColors.BLACK.getIndex());
@@ -389,6 +363,28 @@ public class UberWriter {
     style.setBorderLeft(BorderStyle.THIN);
     style.setBorderRight(BorderStyle.THIN);
     c1.setCellStyle(style);
+  }
+
+  private void prepareGreyHeadersBlock(XSSFWorkbook wb, Sheet sheet, int rowNum, String data0, String data19) {
+    Row row = sheet.createRow(rowNum);
+    IntStream.rangeClosed(0, 19).forEach(i -> {
+      if (i == 0) {
+        headerCell(row, i, data0, wb);
+      } else if (i == 9) {
+        headerCell(row, i, data19, wb);
+
+      } else {
+        headerCell(row, i, EMPTY_STRING, wb);
+      }
+    });
+    CellRangeAddress range1 = new CellRangeAddress(rowNum, rowNum, 0, 8);
+    CellRangeAddress range2 = new CellRangeAddress(rowNum, rowNum, 9, 19);
+    sheet.addMergedRegion(range1);
+    sheet.addMergedRegion(range2);
+  }
+
+  private String mtuSummary(int constraints, int results) {
+    return String.format("There is/are %o CB/CO and %o results in MTU.", constraints, results);
   }
 
 }

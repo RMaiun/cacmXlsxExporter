@@ -1,14 +1,14 @@
-package mairo;
+package mairo.dto;
 
 import java.util.List;
 
-public class ConstraintsContainer {
+public class ConstraintsContainerXlsxTemplate {
   private String area1Name;
   private String area2Name;
   private String area3Name;
   private String area4Name;
   private String area5Name;
-  private List<XlsxConstraintRow> constraintRows;
+  private List<ConstraintXlsxTemplate> constraintRows;
 
   public String getArea5Name() {
     return area5Name;
@@ -50,11 +50,11 @@ public class ConstraintsContainer {
     this.area4Name = area4Name;
   }
 
-  public List<XlsxConstraintRow> getConstraintRows() {
+  public List<ConstraintXlsxTemplate> getConstraintRows() {
     return constraintRows;
   }
 
-  public void setConstraintRows(List<XlsxConstraintRow> constraintRows) {
+  public void setConstraintRows(List<ConstraintXlsxTemplate> constraintRows) {
     this.constraintRows = constraintRows;
   }
 }

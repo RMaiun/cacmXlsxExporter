@@ -1,4 +1,4 @@
-package mairo;
+package mairo.dto;
 
 import java.util.List;
 

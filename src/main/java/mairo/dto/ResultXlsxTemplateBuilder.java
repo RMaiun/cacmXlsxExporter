@@ -1,4 +1,4 @@
-package mairo;
+package mairo.dto;
 
 public final class ResultXlsxTemplateBuilder {
   private String direction;

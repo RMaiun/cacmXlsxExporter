@@ -1,5 +1,7 @@
 package mairo;
 
+import mairo.dto.*;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
@@ -9,7 +11,7 @@ public class Main {
 
   public static void main(String[] args) throws IOException {
     FileOutputStream fileOut = new FileOutputStream("C:\\Hobby\\cacmXlsxExporter\\src\\main\\resources\\templates\\contacts.xlsx");
-    UberWriter writer = new UberWriter();
+    CacmXlsxWriter writer = new CacmXlsxWriter();
 
     NtcBasedAllocationXlsxTemplate data = new NtcBasedAllocationXlsxTemplate();
     data.setTimeInterval("16.05.2019 00:00 - 17.05.2019 00:00");
@@ -18,8 +20,9 @@ public class Main {
 
     XlsxMtu mtu1 = new XlsxMtu();
     mtu1.setInterval("16.05.2019 00:00 - 01:00");
-    mtu1.setSummary("There is/are 195 CB/CO and 2 results in MTU.");
-    ConstraintsContainer constraints = new ConstraintsContainer();
+    mtu1.setConstraintsNum(2);
+    mtu1.setResultsNum(2);
+    ConstraintsContainerXlsxTemplate constraints = new ConstraintsContainerXlsxTemplate();
     constraints.setArea1Name("BZN|FR");
     constraints.setArea2Name("BZN|DE-LU");
     constraints.setArea3Name("BZN|NL");
@@ -64,9 +67,9 @@ public class Main {
     return Arrays.asList(r1, r2);
   }
 
-  private static List<XlsxConstraintRow> constraintValuesDtoList() {
+  private static List<ConstraintXlsxTemplate> constraintValuesDtoList() {
 
-    XlsxConstraintRow dto1 = new XlsxConstraintRow();
+    ConstraintXlsxTemplate dto1 = new ConstraintXlsxTemplate();
     dto1.setConstraintId("18498330000");
     dto1.setCbCoName("Constraint1");
     dto1.setCbCoEic("22T2021…");
@@ -83,7 +86,7 @@ public class Main {
     dto1.setfMax("2182");
     dto1.setActualFlow("164");
 
-    XlsxConstraintRow dto2 = new XlsxConstraintRow();
+    ConstraintXlsxTemplate dto2 = new ConstraintXlsxTemplate();
     dto2.setConstraintId("18498330001");
     dto2.setCbCoName("Constraint2");
     dto2.setCbCoEic("12T2021…");
