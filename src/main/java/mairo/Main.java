@@ -27,12 +27,44 @@ public class Main {
     constraints.setArea5Name("BZN|AT");
     constraints.setConstraintRows(constraintValuesDtoList());
     mtu1.setConstraintContainer(constraints);
-    data.setMtuList(Arrays.asList(mtu1));
+    mtu1.setResults(resultXlsxTemplateList());
+    data.setMtuList(Arrays.asList(mtu1, mtu1));
     writer.generateTemplate(data, fileOut);
     fileOut.close();
   }
 
-  private static List<XlsxConstraintRow> constraintValuesDtoList(){
+  private static List<ResultXlsxTemplate> resultXlsxTemplateList() {
+    ResultXlsxTemplate r1 = ResultXlsxTemplateBuilder.aResultXlsxTemplate()
+        .withDirection("BZN 1 > BZN 2")
+        .withName("IC1")
+        .withEic("22T2021…")
+        .withType("AC Link")
+        .withLocation("Location 1")
+        .withMaxFlow("200")
+        .withMaxExchange("1342")
+        .withMaxExchangeAfterRemedy("2182")
+        .withAac("-0.124")
+        .withTrm("1.1014")
+        .withTtc("10324")
+        .build();
+
+    ResultXlsxTemplate r2 = ResultXlsxTemplateBuilder.aResultXlsxTemplate()
+        .withDirection("BZN 1 > BZN 2")
+        .withName("IC2")
+        .withEic("22T4021…")
+        .withType("AC Link")
+        .withLocation("Location 2")
+        .withMaxFlow("220")
+        .withMaxExchange("1542")
+        .withMaxExchangeAfterRemedy("5182")
+        .withAac("-1.124")
+        .withTrm("8.1014")
+        .withTtc("90324")
+        .build();
+    return Arrays.asList(r1, r2);
+  }
+
+  private static List<XlsxConstraintRow> constraintValuesDtoList() {
 
     XlsxConstraintRow dto1 = new XlsxConstraintRow();
     dto1.setConstraintId("18498330000");
@@ -67,6 +99,6 @@ public class Main {
     dto2.setfRef("1542");
     dto2.setfMax("7182");
     dto2.setActualFlow("964");
-    return  Arrays.asList(dto1, dto2);
+    return Arrays.asList(dto1, dto2);
   }
 }
